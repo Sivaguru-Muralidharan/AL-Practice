@@ -39,8 +39,8 @@ pageextension 80101 SalesOrderDimensionExt extends "Sales Order"
 
                     RecRef.GetTable(Rec);
                     RecRef.Get(Rec.RecordId());
-                    CITDimensionModifier.ConfigureRecord(RecRef, Rec.FieldNo("Dimension Set ID"), Rec.FieldNo("Shortcut Dimension 1 Code"), Rec.FieldNo("Shortcut Dimension 2 Code"));
-                    CITDimensionModifier.UpdateDimensionCode(TempDimSetRec);
+                    CITDimensionModifier.ConfigureRecord(Rec.FieldNo("Dimension Set ID"), Rec.FieldNo("Shortcut Dimension 1 Code"), Rec.FieldNo("Shortcut Dimension 2 Code"));
+                    CITDimensionModifier.UpdateDimensionCode(TempDimSetRec, RecRef);
                 end;
             }
         }

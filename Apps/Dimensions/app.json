@@ -17,7 +17,7 @@
   "idRanges": [
     {
       "from": 80100,
-      "to": 80101
+      "to": 80105
     }
   ],
   "resourceExposurePolicy": {

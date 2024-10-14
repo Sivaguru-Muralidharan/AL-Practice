@@ -4,7 +4,7 @@ using Microsoft.Finance.Dimension;
 
 codeunit 80100 "CIT Dimension Modifier"
 {
-    procedure UpdateDimensionCode(var UpdatedDimSetRec: Record "Dimension Set Entry" temporary)
+    procedure UpdateDimensionCode(var UpdatedDimSetRec: Record "Dimension Set Entry" temporary; var RecRef: RecordRef)
     var
         TempExistingDimSet: Record "Dimension Set Entry" temporary;
         DimensionManagement: Codeunit DimensionManagement;
@@ -15,9 +15,9 @@ codeunit 80100 "CIT Dimension Modifier"
         NewDimension1Code: Code[20];
         NewDimension2Code: Code[20];
     begin
-        DimensionSetIDFieldRef := GlobalRecordRef.Field(GlobalDimensionSetIDFieldNo);
-        Dimension1FieldRef := GlobalRecordRef.Field(GlobalDimension1FieldNo);
-        Dimension2FieldRef := GlobalRecordRef.Field(GlobalDimension2FieldNo);
+        DimensionSetIDFieldRef := RecRef.Field(GlobalDimensionSetIDFieldNo);
+        Dimension1FieldRef := RecRef.Field(GlobalDimension1FieldNo);
+        Dimension2FieldRef := RecRef.Field(GlobalDimension2FieldNo);
         //Added to Get the List of Existing Dimensions in the Dimension Set!
         DimensionManagement.GetDimensionSet(TempExistingDimSet, DimensionSetIDFieldRef.Value);
         if UpdatedDimSetRec.FindSet() then
@@ -43,23 +43,35 @@ codeunit 80100 "CIT Dimension Modifier"
         //This is added because we don't want a scenario where the Global Dimensions are updated in the Dimension Set but not in the Main Table!
         //MUST ADD!!!!!!
         DimensionManagement.UpdateGlobalDimFromDimSetID(NewDimensionSetID, NewDimension1Code, NewDimension2Code);
-        DimensionSetIDFieldRef.Validate(NewDimensionSetID);
-        Dimension1FieldRef.Validate(NewDimension1Code);
-        Dimension2FieldRef.Validate(NewDimension2Code);
-        GlobalRecordRef.Modify(true);
+        SetDimensions(NewDimensionSetID, NewDimension1Code, NewDimension2Code);
     end;
 
-    procedure ConfigureRecord(RecRef: RecordRef; DimensionSetIDFieldNo: Integer; Dimension1FieldNo: Integer; Dimension2FieldNo: Integer)
+    procedure ConfigureRecord(DimensionSetIDFieldNo: Integer; Dimension1FieldNo: Integer; Dimension2FieldNo: Integer)
     begin
-        GlobalRecordRef := RecRef;
         GlobalDimensionSetIDFieldNo := DimensionSetIDFieldNo;
         GlobalDimension1FieldNo := Dimension1FieldNo;
         GlobalDimension2FieldNo := Dimension2FieldNo;
     end;
 
+    local procedure SetDimensions(DimensionSetID: Integer; Dimension1Code: Code[20]; Dimension2Code: Code[20])
+    begin
+        GlobalDimensionSetID := DimensionSetID;
+        GlobalDimension1Code := Dimension1Code;
+        GlobalDimension2Code := Dimension2Code;
+    end;
+
+    procedure GetDimensions(var DimensionSetID: Integer; var Dimension1Code: Code[20]; var Dimension2Code: Code[20])
+    begin
+        DimensionSetID := GlobalDimensionSetID;
+        Dimension1Code := GlobalDimension1Code;
+        Dimension2Code := GlobalDimension2Code;
+    end;
+
     var
-        GlobalRecordRef: RecordRef;
         GlobalDimensionSetIDFieldNo: Integer;
         GlobalDimension1FieldNo: Integer;
         GlobalDimension2FieldNo: Integer;
+        GlobalDimensionSetID: Integer;
+        GlobalDimension1Code: Code[20];
+        GlobalDimension2Code: Code[20];
 }
